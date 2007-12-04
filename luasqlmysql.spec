@@ -3,7 +3,7 @@
 %define soname       mysql
 %define version 2.0b
 %define major        2
-%define release 2mdk
+%define release  %mkrel 2
 %define libname      %mklibname %{name} %{major}
 %define libname_orig %mklibname %{name}
 %define lua_version  5.0
