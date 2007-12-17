@@ -17,7 +17,6 @@ Group:          Development/Other
 URL:            http://www.keplerproject.org/luasql/
 Source0:        %{srcname}-%{version}.tar.bz2
 Patch0:         %{name}.patch.bz2
-BuildRoot:      %_tmppath/%{name}-buildroot
 Obsoletes:      %{libname} = %{version}
 Obsoletes:      %{libname_orig}
 Provides:       %{libname} = %{version}
