@@ -8,7 +8,7 @@
 %define libname_orig %mklibname %{name}
 %define lua_version  5.0
 
-Summary:        LuaMySQL is a simple interface from Lua to MySQL
+Summary:        Simple interface from Lua to MySQL
 Name:           %name
 Version:        %version
 Release:        %release
@@ -27,7 +27,7 @@ Provides:       %{libname_orig}
 LuaMySQL is a simple interface from Lua to MySQL.
 
 %package -n     %{libname}
-Summary:        LuaMySQL is a simple interface from Lua to MySQL
+Summary:        Simple interface from Lua to MySQL
 Group:          Development/Other
 Obsoletes:      %{libname} = %{version}
 Obsoletes:      %{libname_orig}
