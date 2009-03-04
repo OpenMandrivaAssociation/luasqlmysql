@@ -3,8 +3,9 @@
 %define soname       mysql
 %define version 2.0b
 %define major        2
-%define release  %mkrel 4
+%define release  %mkrel 6
 %define libname      %mklibname %{name} %{major}
+%define develname    %mklibname %{name} -d
 %define libname_orig %mklibname %{name}
 %define lua_version  5.0
 
@@ -16,12 +17,12 @@ License:        MIT
 Group:          Development/Other
 URL:            http://www.keplerproject.org/luasql/
 Source0:        %{srcname}-%{version}.tar.bz2
-Patch0:         %{name}.patch.bz2
-BuildRoot:      %_tmppath/%{name}-buildroot
+Patch0:         luasql-2.0b-fix-build.patch
 Obsoletes:      %{libname} = %{version}
 Obsoletes:      %{libname_orig}
 Provides:       %{libname} = %{version}
 Provides:       %{libname_orig}
+BuildRoot:      %_tmppath/%{name}-%{version}
 
 %description
 LuaMySQL is a simple interface from Lua to MySQL.
@@ -39,17 +40,16 @@ BuildRequires:  liblua-devel
 %description -n %{libname}
 LuaMySQL is a simple interface from Lua to MySQL.
 
-%package -n     %{libname}-devel
+%package -n     %{develname}
 Summary:        Static library and header files for the luasqlmysql library
 Group:          Development/Other
 License:        MIT
-Obsoletes:      %{libname}-devel = %{version}
 Obsoletes:      %{libname_orig}-devel
-Provides:       %{libname}-devel = %{version}
 Provides:       %{libname_orig}-devel
 Requires:       %{libname} = %{version}-%{release}
+Obsoletes:      %mklibname %{name} -d 2       
 
-%description -n %{libname}-devel
+%description -n %{develname}
 LuaMySQL is a simple interface from Lua to MySQL.
 
 This package contains the static libluamysql library needed to compile
@@ -57,7 +57,7 @@ applications that use luamysql.
 
 %prep
 %setup -q -n %{srcname}-%{version}
-%patch -p1
+%patch0 -p1
 
 %build
 export CFLAGS="%{optflags} -fPIC"
@@ -93,7 +93,7 @@ fi
 %{_libdir}/lua/%{lua_version}/*.so
 %{_defaultdocdir}/lua/%{lua_version}/%{srcname}/*
 
-%files -n %{libname}-devel
+%files -n %{develname}
 %defattr(-,root,root)
 %{_libdir}/lua/%{lua_version}/*.so
 %{_libdir}/lua/%{lua_version}/*.a
