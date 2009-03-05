@@ -35,7 +35,8 @@ Obsoletes:      %{libname_orig}
 Provides:       %{libname} = %{version}
 Provides:       %{libname_orig}
 Requires:       liblua5
-BuildRequires:  liblua-devel
+BuildRequires:  lua-devel
+BuildRequires:  mysql-devel
 
 %description -n %{libname}
 LuaMySQL is a simple interface from Lua to MySQL.
@@ -60,8 +61,7 @@ applications that use luamysql.
 %patch0 -p1
 
 %build
-export CFLAGS="%{optflags} -fPIC"
-%make mysqllinux
+%make mysqllinux CFLAGS="%{optflags} -fPIC"
 
 %install
 strip %{soname}.so
