@@ -3,7 +3,7 @@
 %define soname       mysql
 %define version 2.0b
 %define major        2
-%define release  %mkrel 7
+%define release  %mkrel 8
 %define libname      %mklibname %{name} %{major}
 %define develname    %mklibname %{name} -d
 %define libname_orig %mklibname %{name}
