@@ -1,0 +1,146 @@
+diff -Naur luasql-2.0b/ls_mysql.c luasql-2.0b-fix-build/ls_mysql.c
+--- luasql-2.0b/ls_mysql.c	2003-12-10 18:44:03.000000000 +0100
++++ luasql-2.0b-fix-build/ls_mysql.c	2009-03-04 23:05:54.000000000 +0100
+@@ -11,7 +11,8 @@
+ #include <string.h>
+ #include <ctype.h>
+ 
+-#include <mysql.h>
++#include <mysql/mysql.h>
++#include <mysql/mysql_com.h>
+ 
+ #include <lua.h>
+ #include <lauxlib.h>
+@@ -40,7 +41,7 @@
+ 	MYSQL_RES *my_res;
+ } cur_data;
+ 
+-LUASQL_API int luasql_libopen_mysql (lua_State *L);
++LUASQL_API int luaopen_mysql (lua_State *L);
+ 
+ 
+ /*
+@@ -107,26 +108,26 @@
+ static char *getcolumntype (enum enum_field_types type) {
+ 
+ 	switch (type) {
+-		case MYSQL_TYPE_VAR_STRING: case MYSQL_TYPE_STRING:
++		case FIELD_TYPE_VAR_STRING: case FIELD_TYPE_STRING:
+ 			return "string";
+-		case MYSQL_TYPE_DECIMAL: case MYSQL_TYPE_SHORT: case MYSQL_TYPE_LONG:
+-		case MYSQL_TYPE_FLOAT: case MYSQL_TYPE_DOUBLE: case MYSQL_TYPE_LONGLONG:
+-		case MYSQL_TYPE_INT24: case MYSQL_TYPE_YEAR: case MYSQL_TYPE_TINY: 
++		case FIELD_TYPE_DECIMAL: case FIELD_TYPE_SHORT: case FIELD_TYPE_LONG:
++		case FIELD_TYPE_FLOAT: case FIELD_TYPE_DOUBLE: case FIELD_TYPE_LONGLONG:
++		case FIELD_TYPE_INT24: case FIELD_TYPE_YEAR: case FIELD_TYPE_TINY: 
+ 			return "number";
+-		case MYSQL_TYPE_TINY_BLOB: case MYSQL_TYPE_MEDIUM_BLOB:
+-		case MYSQL_TYPE_LONG_BLOB: case MYSQL_TYPE_BLOB:
++		case FIELD_TYPE_TINY_BLOB: case FIELD_TYPE_MEDIUM_BLOB:
++		case FIELD_TYPE_LONG_BLOB: case FIELD_TYPE_BLOB:
+ 			return "binary";
+-		case MYSQL_TYPE_DATE: case MYSQL_TYPE_NEWDATE:
++		case FIELD_TYPE_DATE: case FIELD_TYPE_NEWDATE:
+ 			return "date";
+-		case MYSQL_TYPE_DATETIME:
++		case FIELD_TYPE_DATETIME:
+ 			return "datetime";
+-		case MYSQL_TYPE_TIME:
++		case FIELD_TYPE_TIME:
+ 			return "time";
+-		case MYSQL_TYPE_TIMESTAMP:
++		case FIELD_TYPE_TIMESTAMP:
+ 			return "timestamp";
+-		case MYSQL_TYPE_ENUM: case MYSQL_TYPE_SET:
++		case FIELD_TYPE_ENUM: case FIELD_TYPE_SET:
+ 			return "set";
+-		case MYSQL_TYPE_NULL:
++		case FIELD_TYPE_NULL:
+ 			return "null";
+ 		default:
+ 			return "undefined";
+@@ -343,26 +344,30 @@
+ /*
+ ** Commit the current transaction.
+ */
++#if 0
+ static int conn_commit (lua_State *L) {
+ 	conn_data *conn = getconnection (L);
+ 	mysql_commit(conn->my_conn);
+ 	return 0;
+ }
+-
++#endif
+ 
+ /*
+ ** Rollback the current transaction.
+ */
++#if 0
+ static int conn_rollback (lua_State *L) {
+ 	conn_data *conn = getconnection (L);
+ 	mysql_rollback(conn->my_conn);
+ 	return 0;
+ }
++#endif
+ 
+ 
+ /*
+ ** Set "auto commit" property of the connection. Modes ON/OFF
+ */
++#if 0
+ static int conn_setautocommit (lua_State *L) {
+ 	conn_data *conn = getconnection (L);
+ 	if (lua_toboolean (L, 2)) {
+@@ -373,7 +378,7 @@
+ 	}
+ 	return 0;
+ }
+-
++#endif
+ 
+ /*
+ ** Create a new Connection object and push it on top of the stack.
+@@ -450,9 +455,11 @@
+     struct luaL_reg connection_methods[] = {
+         {"close", conn_close},
+         {"execute", conn_execute},
++#if 0
+         {"commit", conn_commit},
+         {"rollback", conn_rollback},
+         {"setautocommit", conn_setautocommit},
++#endif
+ 		{NULL, NULL},
+     };
+     struct luaL_reg cursor_methods[] = {
+@@ -485,7 +492,7 @@
+ ** Creates the metatables for the objects and registers the
+ ** driver open method.
+ */
+-LUASQL_API int luasql_libopen_mysql (lua_State *L) { 
++LUASQL_API int luaopen_mysql (lua_State *L) { 
+ 	luasql_getlibtable (L);
+ 	lua_pushstring(L, "mysql");
+ 	lua_pushcfunction(L, create_environment);
+diff -Naur luasql-2.0b/Makefile luasql-2.0b-fix-build/Makefile
+--- luasql-2.0b/Makefile	2003-12-10 18:44:03.000000000 +0100
++++ luasql-2.0b-fix-build/Makefile	2009-03-04 23:06:43.000000000 +0100
+@@ -19,8 +19,8 @@
+ OCI_INCS= -Itomas/dblua_oci8/linux/include -I/home/oracle/OraHome1/rdbms/demo -I/home/oracle/OraHome1/rdbms/public
+ 
+ MYSQL_OBJ= ls_mysql.o
+-MYSQL_LIB= libluasqlmysql.$(VERSION).a
+-MYSQL_SO= libluasqlmysql.$(VERSION).so
++MYSQL_LIB= mysql.a
++MYSQL_SO= mysql.so
+ MYSQL_DLL= luasqlmysql.$(VERSION).dll
+ MYSQL_LIBS= -L/usr/local/mysql/lib -lmysqlclient
+ MYSQL_INCS= -I/usr/local/mysql/include
+@@ -28,7 +28,7 @@
+ WARN= -Wall -Wmissing-prototypes -Wmissing-declarations -ansi
+ INCS= -I/usr/local/include/lua5 $(PG_INCS) $(OCI_INCS) $(MYSQL_INCS)
+ #LIBS_DIR= -L../lua-5.0/lib
+-LIBS= -llua.5.0 -llualib.5.0 -lm -ldl
++LIBS= -llua -lm -ldl
+ CFLAGS= -O2 $(WARN) $(INCS) $(DEFS)
+ 
+ PKG= luasql-$(VERSION)
