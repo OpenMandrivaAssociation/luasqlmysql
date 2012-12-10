@@ -1,13 +1,15 @@
+%define debug_package %{nil}
+
 %define name         luasqlmysql
 %define srcname      luasql
-%define soname       mysql
-%define version 2.0b
+%define soname       postgres
+%define version	2.2.0
 %define major        2
-%define release  %mkrel 8
+%define release  %mkrel 2
 %define libname      %mklibname %{name} %{major}
 %define develname    %mklibname %{name} -d
 %define libname_orig %mklibname %{name}
-%define lua_version  5.0
+%define lua_version  5.1
 
 Summary:        Simple interface from Lua to MySQL
 Name:           %name
@@ -16,13 +18,12 @@ Release:        %release
 License:        MIT
 Group:          Development/Other
 URL:            http://www.keplerproject.org/luasql/
-Source0:        %{srcname}-%{version}.tar.bz2
-Patch0:         luasql-2.0b-fix-build.patch
+Source0:	https://github.com/downloads/keplerproject/luasql/%{srcname}-%{version}.tar.gz
 Obsoletes:      %{libname} = %{version}
 Obsoletes:      %{libname_orig}
 Provides:       %{libname} = %{version}
 Provides:       %{libname_orig}
-BuildRoot:      %_tmppath/%{name}-%{version}
+BuildRequires:	postgresql-devel	
 
 %description
 LuaMySQL is a simple interface from Lua to MySQL.
@@ -34,7 +35,7 @@ Obsoletes:      %{libname} = %{version}
 Obsoletes:      %{libname_orig}
 Provides:       %{libname} = %{version}
 Provides:       %{libname_orig}
-Requires:       liblua5
+Requires:       lua
 BuildRequires:  lua-devel
 BuildRequires:  mysql-devel
 
@@ -58,24 +59,18 @@ applications that use luamysql.
 
 %prep
 %setup -q -n %{srcname}-%{version}
-%patch0 -p1
 
 %build
-%make mysqllinux CFLAGS="%{optflags} -fPIC"
+%make CFLAGS="%{optflags} -fPIC"
 
 %install
-strip %{soname}.so
-%__rm -rf %{buildroot}
-install -d %{buildroot}/%{_includedir}/lua/%{lua_version}
-install -d %{buildroot}/%{_libdir}/lua/%{lua_version}
+strip src/%{soname}.so
+mkdir -p  %{buildroot}%{_libdir}/lua/%{lua_version}
+make install LUA_LIBDIR=%{buildroot}%{_libdir}/lua/%{lua_version}
+
 install -d %{buildroot}/%{_datadir}/lua/%{lua_version}
 install -d %{buildroot}/%{_defaultdocdir}/lua/%{lua_version}/%{srcname}
-install -m0755 %{soname}.so %{buildroot}%{_libdir}/lua/%{lua_version}
-install -m0644 %{soname}.a %{buildroot}/%{_libdir}/lua/%{lua_version}
-install -m0644 README %{buildroot}%{_defaultdocdir}/lua/%{lua_version}/%{srcname}
-install -m0644 manual.html %{buildroot}%{_defaultdocdir}/lua/%{lua_version}/%{srcname}
-install -m0644 index.html %{buildroot}%{_defaultdocdir}/lua/%{lua_version}/%{srcname}
-install -m0644 license.html %{buildroot}%{_defaultdocdir}/lua/%{lua_version}/%{srcname}
+cp -r doc/  %{buildroot}%{_defaultdocdir}/lua/%{lua_version}/%{srcname}
 
 %post -n %{libname}
 cd %{_datadir}/lua/%{lua_version} && rm -f %{soname}.lua && ln default.lua %{soname}.lua
@@ -85,16 +80,7 @@ if [ "$1" = "0" ]; then
   rm -f %{_datadir}/lua/%{lua_version}/%{soname}.lua
 fi
 
-%clean
-%__rm -rf %{buildroot}
-
 %files -n %{libname}
-%defattr(-,root,root)
-%{_libdir}/lua/%{lua_version}/*.so
+%{_libdir}/lua/%{lua_version}/%{srcname}/*.so
 %{_defaultdocdir}/lua/%{lua_version}/%{srcname}/*
-
-%files -n %{develname}
-%defattr(-,root,root)
-%{_libdir}/lua/%{lua_version}/*.so
-%{_libdir}/lua/%{lua_version}/*.a
 
