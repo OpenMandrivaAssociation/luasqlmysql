@@ -5,7 +5,7 @@
 %define soname       postgres
 %define version	2.2.0
 %define major        2
-%define release  %mkrel 2
+%define release  3
 %define libname      %mklibname %{name} %{major}
 %define develname    %mklibname %{name} -d
 %define libname_orig %mklibname %{name}
