@@ -1,24 +1,21 @@
 %define debug_package %{nil}
 
-%define name         luasqlmysql
 %define srcname      luasql
 %define soname       postgres
-%define version	2.2.0
 %define major        2
-%define release  3
-%define libname      %mklibname %{name} %{major}
+%define libname      %mklibname %{name}
 %define develname    %mklibname %{name} -d
 %define libname_orig %mklibname %{name}
-%define lua_version  5.1
+%define lua_version  5.3
 
 Summary:        Simple interface from Lua to MySQL
-Name:           %name
-Version:        %version
-Release:        %release
+Name:           luasqlmysql
+Version:        2.6.0
+Release:        1
 License:        MIT
 Group:          Development/Other
-URL:            http://www.keplerproject.org/luasql/
-Source0:	https://github.com/downloads/keplerproject/luasql/%{srcname}-%{version}.tar.gz
+URL:            https://github.com/lunarmodules/luasql
+Source0:	https://github.com/lunarmodules/luasql/archive/refs/tags/%{version}.tar.gz
 Obsoletes:      %{libname} = %{version}
 Obsoletes:      %{libname_orig}
 Provides:       %{libname} = %{version}
@@ -61,7 +58,7 @@ applications that use luamysql.
 %setup -q -n %{srcname}-%{version}
 
 %build
-%make CFLAGS="%{optflags} -fPIC"
+%make CFLAGS="%{optflags} -fPIC" mysql postgres sqlite3
 
 %install
 strip src/%{soname}.so
