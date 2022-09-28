@@ -21,6 +21,9 @@ Obsoletes:      %{libname_orig}
 Provides:       %{libname} = %{version}
 Provides:       %{libname_orig}
 BuildRequires:	postgresql-devel	
+BuildRequires:	pkgconfig(sqlite3)
+BuildRequires:  lua-devel
+BuildRequires:  mysql-devel
 
 %description
 LuaMySQL is a simple interface from Lua to MySQL.
@@ -33,8 +36,6 @@ Obsoletes:      %{libname_orig}
 Provides:       %{libname} = %{version}
 Provides:       %{libname_orig}
 Requires:       lua
-BuildRequires:  lua-devel
-BuildRequires:  mysql-devel
 
 %description -n %{libname}
 LuaMySQL is a simple interface from Lua to MySQL.
