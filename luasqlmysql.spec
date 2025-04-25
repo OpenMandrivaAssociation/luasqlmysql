@@ -10,7 +10,7 @@
 
 Summary:        Simple interface from Lua to MySQL
 Name:           luasqlmysql
-Version:        2.6.0
+Version:        2.7.0
 Release:        1
 License:        MIT
 Group:          Development/Other
